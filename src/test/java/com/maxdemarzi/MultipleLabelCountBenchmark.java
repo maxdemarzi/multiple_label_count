@@ -17,16 +17,16 @@ import java.util.concurrent.TimeUnit;
 public class MultipleLabelCountBenchmark {
     private GraphDatabaseService db;
 
-    @Param({"10000"})
+    @Param({"100000"})
     private int userCount;
 
-    @Param({"1000"})
+    @Param({"10000"})
     private int actorCount;
 
-    @Param({"200000"})
+    @Param({"2000000"})
     private int personCount;
 
-    @Setup(Level.Iteration)
+    @Setup(Level.Trial)
     public void prepare() throws Exception {
         db = new TestGraphDatabaseFactory().newImpermanentDatabase();
         TestUtils.registerProcedure(db, Procedures.class);
@@ -43,7 +43,7 @@ public class MultipleLabelCountBenchmark {
                 if (count < userCount) {
                     personNode.addLabel(Label.label("User"));
                 }
-                if(count++ % 1_000 == 0){
+                if (count++ % 100_000 == 0) {
                     tx.success();
                     tx.close();
                     tx = db.beginTx();
@@ -61,9 +61,27 @@ public class MultipleLabelCountBenchmark {
     @Measurement(iterations = 10)
     @Fork(1)
     @Threads(1)
-    @BenchmarkMode(Mode.All)
+    @BenchmarkMode(Mode.Throughput)
     @OutputTimeUnit(TimeUnit.SECONDS)
     public long measureMultipleLabelCount() throws IOException {
+
+        try (Transaction tx = db.beginTx()) {
+
+            Map<String, Object> result = db.execute("CALL com.maxdemarzi.multiple_label_count(['Person','User', 'Actor']) YIELD value RETURN value").next();
+
+            return (Long)result.get("value");
+
+        }
+    }
+
+    @Benchmark
+    @Warmup(iterations = 10)
+    @Measurement(iterations = 10)
+    @Fork(1)
+    @Threads(1)
+    @BenchmarkMode(Mode.Throughput)
+    @OutputTimeUnit(TimeUnit.SECONDS)
+    public long measureMultipleLabelCount2() throws IOException {
 
         try (Transaction tx = db.beginTx()) {
 
@@ -73,5 +91,4 @@ public class MultipleLabelCountBenchmark {
 
         }
     }
-
 }
