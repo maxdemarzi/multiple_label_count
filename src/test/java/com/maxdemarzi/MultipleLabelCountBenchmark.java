@@ -74,21 +74,4 @@ public class MultipleLabelCountBenchmark {
         }
     }
 
-    @Benchmark
-    @Warmup(iterations = 10)
-    @Measurement(iterations = 10)
-    @Fork(1)
-    @Threads(1)
-    @BenchmarkMode(Mode.Throughput)
-    @OutputTimeUnit(TimeUnit.SECONDS)
-    public long measureMultipleLabelCount2() throws IOException {
-
-        try (Transaction tx = db.beginTx()) {
-
-            Map<String, Object> result = db.execute("CALL com.maxdemarzi.multiple_label_count2(['Person','User', 'Actor']) YIELD value RETURN value").next();
-
-            return (Long)result.get("value");
-
-        }
-    }
 }

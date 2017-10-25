@@ -29,10 +29,11 @@ public class MultipleLabelCountTest {
     private static final HashMap<String, Object> QUERY = new HashMap<String, Object>(){{
         put("statements", new ArrayList<Map<String, Object>>() {{
             add(new HashMap<String, Object>() {{
-                put("statement", "CALL com.maxdemarzi.multiple_label_count2(['Label1','Label2', 'Label3']) YIELD value RETURN value");
+                put("statement", "CALL com.maxdemarzi.multiple_label_count(['Label1','Label2', 'Label3']) YIELD value RETURN value");
             }});
         }});
     }};
+
     private static final String MODEL_STATEMENT =
             "CREATE (c1:Label1:Label2:Label3 {id:'c1'})" +
                     "CREATE (c2:Label1:Label2:Label3 {id:'c2'})" +
